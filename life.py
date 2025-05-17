@@ -1,6 +1,8 @@
 import random
 import time
 import os
+import sys
+import shutil
 
 # Simple implementation of Conway's Game of Life
 
@@ -8,6 +10,22 @@ WIDTH = 20
 HEIGHT = 10
 ALIVE = 'O'
 DEAD = ' '
+
+
+def get_board_size(default_width, default_height):
+    """Determine board size using stdin or terminal size."""
+    width, height = default_width, default_height
+    if not sys.stdin.isatty():
+        data = sys.stdin.read().strip().split()
+        if len(data) >= 2 and all(part.isdigit() for part in data[:2]):
+            height, width = int(data[0]), int(data[1])
+            return width, height
+    try:
+        size = shutil.get_terminal_size()
+        width, height = size.columns, size.lines - 1
+    except OSError:
+        pass
+    return width, height
 
 def random_grid(width, height):
     return [[random.choice([True, False]) for _ in range(width)] for _ in range(height)]
@@ -45,6 +63,8 @@ def step(grid):
     return new_grid
 
 def main():
+    global WIDTH, HEIGHT
+    WIDTH, HEIGHT = get_board_size(WIDTH, HEIGHT)
     grid = random_grid(WIDTH, HEIGHT)
     generation = 0
     try:

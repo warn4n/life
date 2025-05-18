@@ -11,6 +11,16 @@ A minimal implementation of John Horton Conway's [Game of Life](https://en.wikip
    ```
 3. The simulation will display generations in your terminal. Press `Ctrl+C` to stop.
 
+### Graphical Mode
+
+To see the Game of Life in a simple graphical window, run the script with the `--gui` flag:
+
+```bash
+python3 life.py --gui
+```
+
+You can still pipe `stty size` to specify a window size or edit `WIDTH` and `HEIGHT` in `life.py`.
+
 The board now automatically scales to your terminal size. You can also pipe the
 output of `stty size` to specify a custom size:
 

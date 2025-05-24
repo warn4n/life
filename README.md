@@ -11,6 +11,20 @@ A minimal implementation of John Horton Conway's [Game of Life](https://en.wikip
    ```
 3. The simulation will display generations in your terminal. Press `Ctrl+C` to stop.
 
+### Starting patterns
+
+By default the board begins with a random collection of live cells. Use the `--pattern` option to start with one of several predefined patterns such as `glider`, `pulsar` or `gosper`:
+
+```bash
+python3 life.py --pattern glider
+```
+
+The option also works together with graphical mode:
+
+```bash
+python3 life.py --gui --pattern gosper
+```
+
 ### Graphical Mode
 
 To see the Game of Life in a simple graphical window, run the script with the `--gui` flag:

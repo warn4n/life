@@ -12,7 +12,7 @@ except ImportError:
 
 # Simple implementation of Conway's Game of Life using an unbounded board
 
-# Initial area of random live cells
+# Initial area dimensions for random or centered patterns
 WIDTH = 20
 HEIGHT = 10
 
@@ -56,6 +56,16 @@ def random_cells(width, height):
     return cells
 
 
+def initial_cells(pattern, width, height):
+    """Return a set of starting cells for the given pattern."""
+    if pattern == "random":
+        return random_cells(width, height)
+    cells = PATTERNS.get(pattern, set())
+    offset_x = width // 2
+    offset_y = height // 2
+    return {(x + offset_x, y + offset_y) for (x, y) in cells}
+
+
 def bounding_box(cells):
     if not cells:
         return 0, 0, 0, 0
@@ -79,6 +89,43 @@ NEIGHBOR_OFFSETS = [
     (-1, 0),            (1, 0),
     (-1, 1),  (0, 1),  (1, 1),
 ]
+
+# Some interesting starting patterns defined relative to (0, 0)
+PATTERNS = {
+    "glider": {
+        (1, 0), (2, 1),
+        (0, 2), (1, 2), (2, 2),
+    },
+    "pulsar": {
+        (2, 0), (3, 0), (4, 0), (8, 0), (9, 0), (10, 0),
+        (0, 2), (5, 2), (7, 2), (12, 2),
+        (0, 3), (5, 3), (7, 3), (12, 3),
+        (0, 4), (5, 4), (7, 4), (12, 4),
+        (2, 5), (3, 5), (4, 5), (8, 5), (9, 5), (10, 5),
+        (2, 7), (3, 7), (4, 7), (8, 7), (9, 7), (10, 7),
+        (0, 8), (5, 8), (7, 8), (12, 8),
+        (0, 9), (5, 9), (7, 9), (12, 9),
+        (0, 10), (5, 10), (7, 10), (12, 10),
+        (2, 12), (3, 12), (4, 12), (8, 12), (9, 12), (10, 12),
+    },
+    "gosper": {
+        (0, 4), (0, 5), (1, 4), (1, 5),
+        (10, 4), (10, 5), (10, 6),
+        (11, 3), (11, 7),
+        (12, 2), (12, 8),
+        (13, 2), (13, 8),
+        (14, 5),
+        (15, 3), (15, 7),
+        (16, 4), (16, 5), (16, 6),
+        (17, 5),
+        (20, 2), (20, 3), (20, 4),
+        (21, 2), (21, 3), (21, 4),
+        (22, 1), (22, 5),
+        (24, 0), (24, 1), (24, 5), (24, 6),
+        (34, 2), (34, 3),
+        (35, 2), (35, 3),
+    },
+}
 
 
 def step(cells):
@@ -169,12 +216,20 @@ def run_gui(cells):
 
 def main():
     parser = argparse.ArgumentParser(description="Conway's Game of Life")
-    parser.add_argument("--gui", action="store_true", help="display the game in a graphical window")
+    parser.add_argument(
+        "--gui", action="store_true", help="display the game in a graphical window"
+    )
+    parser.add_argument(
+        "--pattern",
+        choices=["random"] + sorted(PATTERNS.keys()),
+        default="random",
+        help="starting pattern to use",
+    )
     args = parser.parse_args()
 
     global WIDTH, HEIGHT
     WIDTH, HEIGHT = get_board_size(WIDTH, HEIGHT)
-    cells = random_cells(WIDTH, HEIGHT)
+    cells = initial_cells(args.pattern, WIDTH, HEIGHT)
 
     if args.gui:
         run_gui(cells)

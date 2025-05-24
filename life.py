@@ -74,21 +74,29 @@ def print_cells(cells):
         print(row)
 
 
+NEIGHBOR_OFFSETS = [
+    (-1, -1), (0, -1), (1, -1),
+    (-1, 0),            (1, 0),
+    (-1, 1),  (0, 1),  (1, 1),
+]
+
+
 def step(cells):
     """Compute the next generation for an unbounded board."""
-    neighbor_counts = {}
-    for (x, y) in cells:
-        for dy in (-1, 0, 1):
-            for dx in (-1, 0, 1):
-                if dx == 0 and dy == 0:
-                    continue
-                key = (x + dx, y + dy)
-                neighbor_counts[key] = neighbor_counts.get(key, 0) + 1
-    new_cells = set()
-    for cell, count in neighbor_counts.items():
-        if count == 3 or (count == 2 and cell in cells):
-            new_cells.add(cell)
-    return new_cells
+    from collections import Counter
+
+    # Use Counter for neighbor accumulation which is implemented in C and is
+    # generally faster than manually updating a dict in Python.
+    counts = Counter(
+        (x + dx, y + dy)
+        for (x, y) in cells
+        for (dx, dy) in NEIGHBOR_OFFSETS
+    )
+    return {
+        pos
+        for pos, count in counts.items()
+        if count == 3 or (count == 2 and pos in cells)
+    }
 
 
 # ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@ import os
 import sys
 import shutil
 import argparse
+import math
 
 try:
     import tkinter as tk
@@ -192,7 +193,10 @@ def run_gui(cells):
 
     def zoom(factor):
         global CELL_SIZE, OFFSET_X, OFFSET_Y
-        new_size = int(CELL_SIZE * factor)
+        if factor > 1:
+            new_size = math.ceil(CELL_SIZE * factor)
+        else:
+            new_size = math.floor(CELL_SIZE * factor)
         new_size = min(max(new_size, 2), 50)
         if new_size == CELL_SIZE:
             return

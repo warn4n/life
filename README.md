@@ -34,3 +34,8 @@ stty size | python3 life.py
 
 You can still edit `WIDTH` and `HEIGHT` at the top of `life.py` if you want to
 specify fixed dimensions regardless of your terminal size.
+
+### Performance
+
+The evolution step now uses `collections.Counter` under the hood which
+provides a noticeable speed boost when many cells are alive.

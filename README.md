@@ -21,6 +21,10 @@ python3 life.py --gui
 
 You can still pipe `stty size` to specify a window size or edit `WIDTH` and `HEIGHT` in `life.py`.
 
+### New features
+
+The board is now unbounded. When running in GUI mode you can use the arrow keys to pan around the infinite board and `+` or `-` to zoom in and out.
+
 The board now automatically scales to your terminal size. You can also pipe the
 output of `stty size` to specify a custom size:
 

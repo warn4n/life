@@ -176,9 +176,33 @@ def run_gui(cells):
     root = tk.Tk()
     canvas = tk.Canvas(root, width=800, height=600, bg="white")
     canvas.pack(fill="both", expand=True)
+    root.update_idletasks()
+
+    # Center view on starting pattern
+    canvas_width = canvas.winfo_width()
+    canvas_height = canvas.winfo_height()
+    min_x, min_y, max_x, max_y = bounding_box(cells)
+    center_x = (min_x + max_x) / 2
+    center_y = (min_y + max_y) / 2
+    OFFSET_X = center_x - canvas_width / (2 * CELL_SIZE)
+    OFFSET_Y = center_y - canvas_height / (2 * CELL_SIZE)
     root.focus_set()
 
     generation = 0
+
+    def zoom(factor):
+        global CELL_SIZE, OFFSET_X, OFFSET_Y
+        new_size = int(CELL_SIZE * factor)
+        new_size = min(max(new_size, 2), 50)
+        if new_size == CELL_SIZE:
+            return
+        canvas_width = canvas.winfo_width()
+        canvas_height = canvas.winfo_height()
+        center_x = OFFSET_X + canvas_width / (2 * CELL_SIZE)
+        center_y = OFFSET_Y + canvas_height / (2 * CELL_SIZE)
+        CELL_SIZE = new_size
+        OFFSET_X = center_x - canvas_width / (2 * CELL_SIZE)
+        OFFSET_Y = center_y - canvas_height / (2 * CELL_SIZE)
 
     def update():
         nonlocal cells, generation
@@ -199,9 +223,9 @@ def run_gui(cells):
         elif event.keysym == 'Right':
             OFFSET_X += 5
         elif event.keysym in ('plus', 'equal'):
-            CELL_SIZE = min(int(CELL_SIZE * 1.2), 50)
+            zoom(1.2)
         elif event.keysym in ('minus', 'underscore'):
-            CELL_SIZE = max(int(CELL_SIZE / 1.2), 2)
+            zoom(1 / 1.2)
         draw_cells_tk(canvas, cells, OFFSET_X, OFFSET_Y, CELL_SIZE)
 
     root.bind('<Key>', on_key)
@@ -217,6 +241,11 @@ def run_gui(cells):
 def main():
     parser = argparse.ArgumentParser(description="Conway's Game of Life")
     parser.add_argument(
+        "--help-all",
+        action="store_true",
+        help="show extended help including available patterns and GUI controls",
+    )
+    parser.add_argument(
         "--gui", action="store_true", help="display the game in a graphical window"
     )
     parser.add_argument(
@@ -226,6 +255,14 @@ def main():
         help="starting pattern to use",
     )
     args = parser.parse_args()
+
+    if args.help_all:
+        parser.print_help()
+        print("\nAvailable patterns:")
+        for name in sorted(PATTERNS.keys()):
+            print(f"  {name}")
+        print("\nGUI controls:\n  Arrow keys move the view\n  + or - zoom in and out")
+        return
 
     global WIDTH, HEIGHT
     WIDTH, HEIGHT = get_board_size(WIDTH, HEIGHT)

@@ -25,6 +25,12 @@ The option also works together with graphical mode:
 python3 life.py --gui --pattern gosper
 ```
 
+### Getting help
+
+Use `-h` or `--help` to see a summary of available command line options. Run
+the script with `--help-all` to list all built-in patterns and the keys used to
+pan and zoom when running in GUI mode.
+
 ### Graphical Mode
 
 To see the Game of Life in a simple graphical window, run the script with the `--gui` flag:
@@ -37,7 +43,7 @@ You can still pipe `stty size` to specify a window size or edit `WIDTH` and `HEI
 
 ### New features
 
-The board is now unbounded. When running in GUI mode you can use the arrow keys to pan around the infinite board and `+` or `-` to zoom in and out.
+The board is now unbounded. When running in GUI mode you can use the arrow keys to pan around the infinite board and `+` or `-` to zoom in and out. The view starts centered on any predefined pattern and zooming always uses the centre of the window as its origin.
 
 The board now automatically scales to your terminal size. You can also pipe the
 output of `stty size` to specify a custom size:

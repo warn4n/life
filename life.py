@@ -5,6 +5,7 @@ import sys
 import shutil
 import argparse
 import math
+import curses
 
 try:
     import tkinter as tk
@@ -239,6 +240,73 @@ def run_gui(cells):
 
 
 # ---------------------------------------------------------------------------
+# Curses-based editor and simulation
+# ---------------------------------------------------------------------------
+
+
+def run_curses(cells, width, height):
+    """Run the simulation using a curses-based interface with editing."""
+
+    def draw(stdscr, cells, cursor=None):
+        for y in range(height):
+            for x in range(width):
+                ch = ALIVE if (x, y) in cells else DEAD
+                if cursor == (x, y):
+                    stdscr.addch(y, x, ch, curses.A_REVERSE)
+                else:
+                    stdscr.addch(y, x, ch)
+        stdscr.refresh()
+
+    def edit_mode(stdscr, cells):
+        x, y = 0, 0
+        while True:
+            draw(stdscr, cells, (x, y))
+            stdscr.addstr(height, 0, "Arrows move, space toggles, Enter to start")
+            key = stdscr.getch()
+            if key in (curses.KEY_ENTER, ord("\n"), ord("\r"), ord("s")):
+                return cells
+            if key == ord("q"):
+                raise KeyboardInterrupt
+            if key == curses.KEY_UP and y > 0:
+                y -= 1
+            elif key == curses.KEY_DOWN and y < height - 1:
+                y += 1
+            elif key == curses.KEY_LEFT and x > 0:
+                x -= 1
+            elif key == curses.KEY_RIGHT and x < width - 1:
+                x += 1
+            elif key == ord(" "):
+                if (x, y) in cells:
+                    cells.remove((x, y))
+                else:
+                    cells.add((x, y))
+
+    def curses_main(stdscr):
+        curses.curs_set(0)
+        cells_local = set(cells)
+        cells_local = edit_mode(stdscr, cells_local)
+        generation = 0
+        stdscr.nodelay(True)
+        while True:
+            draw(stdscr, cells_local)
+            stdscr.addstr(height, 0, "p: pause/edit  q: quit                ")
+            stdscr.addstr(height + 1, 0, f"Generation: {generation}")
+            key = stdscr.getch()
+            if key == ord("q"):
+                break
+            if key == ord("p"):
+                stdscr.nodelay(False)
+                cells_local = edit_mode(stdscr, cells_local)
+                stdscr.nodelay(True)
+                continue
+            time.sleep(0.2)
+            cells_local = step(cells_local)
+            generation += 1
+
+    curses.wrapper(curses_main)
+
+
+# ---------------------------------------------------------------------------
 # Main loop for terminal mode
 # ---------------------------------------------------------------------------
 
@@ -251,6 +319,11 @@ def main():
     )
     parser.add_argument(
         "--gui", action="store_true", help="display the game in a graphical window"
+    )
+    parser.add_argument(
+        "--curses",
+        action="store_true",
+        help="use a curses interface with an editor",
     )
     parser.add_argument(
         "--pattern",
@@ -274,6 +347,9 @@ def main():
 
     if args.gui:
         run_gui(cells)
+        return
+    if args.curses:
+        run_curses(cells, WIDTH, HEIGHT)
         return
 
     generation = 0

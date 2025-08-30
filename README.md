@@ -41,6 +41,16 @@ python3 life.py --gui
 
 You can still pipe `stty size` to specify a window size or edit `WIDTH` and `HEIGHT` in `life.py`.
 
+### Curses Mode
+
+For an interactive terminal interface that lets you edit the board, use the `--curses` flag:
+
+```bash
+python3 life.py --curses
+```
+
+Use the arrow keys to move the cursor and the space bar to toggle cells. Press `Enter` to start the simulation, `p` to pause and edit again, and `q` to quit.
+
 ### New features
 
 The board is now unbounded. When running in GUI mode you can use the arrow keys to pan around the infinite board and `+` or `-` to zoom in and out. The view starts centered on any predefined pattern and zooming always uses the centre of the window as its origin.
